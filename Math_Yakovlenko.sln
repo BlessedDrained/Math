@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Math.QrBarcode", "Math.QrBarcode\Math.QrBarcode.csproj", "{EE022B6F-756D-4DEF-A492-64F791C7D16A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Math.Labs", "Math.Labs\Math.Labs.csproj", "{EE022B6F-756D-4DEF-A492-64F791C7D16A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
