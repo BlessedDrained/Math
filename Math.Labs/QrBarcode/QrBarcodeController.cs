@@ -36,7 +36,8 @@ public class QrBarcodeController : ControllerBase
     private static readonly Code128EncodingOptions _code128EncodingOptions = new()
     {
         Width = 300,
-        Height = 100
+        Height = 100,
+        Margin = 20
     };
 
 #pragma warning disable CA1416
