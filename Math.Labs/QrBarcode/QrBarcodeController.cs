@@ -3,13 +3,10 @@ using System.Drawing.Imaging;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
 using ZXing;
-using ZXing.OneD;
-using ZXing.QrCode;
-using ZXing.QrCode.Internal;
-using ZXing.Windows.Compatibility;
 
 namespace Math.Code.QrBarcode;
 
+#pragma warning disable CA1416
 /// <summary>
 /// Контроллер, содержащий решения для лабораторных работ по дисциплине "Основы теории кодирования и шифрования"
 /// </summary>
@@ -17,49 +14,12 @@ namespace Math.Code.QrBarcode;
 [Route("barcode")]
 public class QrBarcodeController : ControllerBase
 {
-    #region QR/Barcode
+    private readonly IServiceProvider _serviceProvider;
 
-    /// <summary>
-    /// singleton настроек генерации qr кодов
-    /// </summary>
-    private static readonly QrCodeEncodingOptions _options = new()
+    public QrBarcodeController(IServiceProvider serviceProvider)
     {
-        DisableECI = true,
-        Height = 300,
-        Width = 300,
-        ErrorCorrection = ErrorCorrectionLevel.H
-    };
-
-    /// <summary>
-    /// singleton настроек генерации штрихкодов
-    /// </summary>
-    private static readonly Code128EncodingOptions _code128EncodingOptions = new()
-    {
-        Width = 300,
-        Height = 100,
-        Margin = 20
-    };
-
-#pragma warning disable CA1416
-    /// <summary>
-    /// singleton генератора штрихкодов
-    /// </summary>
-    private static readonly BarcodeWriter<Bitmap> _barcodeWriter = new()
-    {
-        Format = BarcodeFormat.CODE_128,
-        Options = _code128EncodingOptions,
-        Renderer = new BitmapRenderer()
-    };
-
-    /// <summary>
-    /// singleton генератора qr кодов
-    /// </summary>
-    private static readonly BarcodeWriter<Bitmap> _qrCodeWriter = new()
-    {
-        Format = BarcodeFormat.QR_CODE,
-        Options = _options,
-        Renderer = new BitmapRenderer()
-    };
+        _serviceProvider = serviceProvider;
+    }
     
     /// <summary>
     /// Генерация штрих-кода
@@ -69,9 +29,10 @@ public class QrBarcodeController : ControllerBase
     {
         var codeByteList = input.CodeType switch
         {
-            CodeType.Qr => _qrCodeWriter.Write(input.Input),
-            CodeType.Barcode => _barcodeWriter.Write(input.Input),
-            _ => throw new ArgumentOutOfRangeException()
+          
+            CodeType.Qr => _serviceProvider.GetRequiredKeyedService<BarcodeWriter<Bitmap>>(DiKeyConstants.QrKey).Write(input.Input),
+            CodeType.Barcode => _serviceProvider.GetRequiredKeyedService<BarcodeWriter<Bitmap>>(DiKeyConstants.BarcodeKey).Write(input.Input),
+            _ => throw new ArgumentOutOfRangeException(nameof(input.CodeType))
         };
         
         // Создание стрима для записи
@@ -88,8 +49,6 @@ public class QrBarcodeController : ControllerBase
         // Выше было задано, что изображение будет возвращено в формате PNG. Указываем соответствующий content-type
         return File(ms, MediaTypeNames.Image.Png);
     }
-
-    #endregion
     
     public class GenerateCodeRequest
     {
