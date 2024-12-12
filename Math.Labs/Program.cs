@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Text.Json;
 using Math.Code.QrBarcode;
 using ZXing;
 using ZXing.OneD;
@@ -8,7 +9,9 @@ using ZXing.Windows.Compatibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(x => x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -35,7 +38,7 @@ var qrCodeWriter = new BarcodeWriter<Bitmap>()
         DisableECI = true,
         Height = 300,
         Width = 300,
-        ErrorCorrection = ErrorCorrectionLevel.H
+        ErrorCorrection = ErrorCorrectionLevel.H,
     },
     Renderer = new BitmapRenderer()
 };
@@ -43,6 +46,7 @@ var qrCodeWriter = new BarcodeWriter<Bitmap>()
 builder.Services.AddKeyedSingleton(DiKeyConstants.QrKey, qrCodeWriter);
 
 #pragma warning restore CA1416
+
 
 var app = builder.Build();
 
